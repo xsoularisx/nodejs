@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdn.socket.io/3.1.3/socket.io.min.js"
+		integrity="sha384-cPwlPLvBTa3sKAgddT6krw0cJat7egBga3DJepJyrLl4Q9/5WLra3rrnMcyTyOnh"
+		crossorigin="anonymous"></script>
+	<title>Document</title>
+</head>
+
+<body>
+	<form id="form">
+		<input type="text" id="input" autofocus>
+		<button type="submit" id="button">send</button>
+	</form>
+	<div id="messages"></div>
+
+	<script type="text/javascript">
+
+		const socket = io('localhost:3000');
+
+		socket.on('connect', function () {
+			person_name = prompt("Welcome. Please enter your name");
+			socket.emit('NewPlayer', person_name);
+		});
+
+		socket.on('NEW_CLIENT_CONNECTED', () => {
+			console.log('new client has been connected');
+		});
+
+		socket.on('SERVER_MSG', data => {
+			const mes = document.createElement('span');
+			mes.innerHTML = data.message;
+			document.querySelector('#messages').append(mes);
+			document.querySelector('#messages').append(document.createElement('br'));
+		});
+
+		document.querySelector('#button').onclick = () => {
+			let text = document.querySelector('#input').value;
+			socket.emit('CLIENT_MSG', {
+				message: text
+			});
+		};
+
+		const form = document.getElementById("form");
+		form.addEventListener('submit', (e) => {
+			e.preventDefault();
+			e.target.reset();
+		})
+
+	</script>
+</body>
+
+</html>
